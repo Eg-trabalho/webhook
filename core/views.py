@@ -79,7 +79,7 @@ def read_csv_and_send_messages(request):
                 # Chamar a função de envio de mensagem
                 send_interactive_message(phone_number, nickname)
 
-        return JsonResponse({f"status": "success", "message": "{cnt} Mensagens simuladas enviadas com sucesso!"}, status=200)
+        return JsonResponse({"status": "success", "message": f"{cnt} Mensagens simuladas enviadas com sucesso!"}, status=200)
 
     except Exception as e:
         print("Erro durante a leitura ou envio de mensagens:", str(e))
