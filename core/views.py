@@ -16,7 +16,7 @@ def whatsapp_webhook(request):
         challenge = request.GET.get("hub.challenge")
 
         if mode == "subscribe" and token == VERIFY_TOKEN:
-            return JsonResponse({"hub.challenge": challenge})
+            return HttpResponse(challenge, content_type="text/plain", status=200)
         else:
             return JsonResponse({"error": "Token de verificação inválido"}, status=403)
 
