@@ -10,7 +10,7 @@ import requests
 @csrf_exempt
 def whatsapp_webhook(request):
     if request.method == "GET":
-        VERIFY_TOKEN = "seu_token_de_verificacao"
+        VERIFY_TOKEN = "EAAx0ZAUKt3F4BO5q5oQDmjAa39TQD04DT2tiMRpVDHyGVK5LRRgYQaopqUgaEyuJVPFri4kv3Ij1OyPZBZA7N0qkqvCZC2Uhs6xn6sOs6FW2nCdjdh0bKB09q5pgRbOz5PRhwaKKqbBVnBeAMFRlvaAFAq0A9WfaaMbc0tlIMZCnrX4lZAgtomoZBLZA9f7R2yn2dKEhizZAxCkgEtyf6GdU4XeUoMQZDZD"
         mode = request.GET.get("hub.mode")
         token = request.GET.get("hub.verify_token")
         challenge = request.GET.get("hub.challenge")
