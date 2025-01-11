@@ -40,7 +40,7 @@ def process_incoming_message(message):
     print(f"Mensagem recebida de {from_number}: {text}")
     # Responda com lógica baseada no texto recebido
 
-
+@csrf_exempt 
 def send_interactive_message(phone_number, nickname):
     # Simulação do envio de mensagem (sem requisição real)
    
@@ -52,6 +52,7 @@ def send_interactive_message(phone_number, nickname):
     # Aqui, em vez de enviar para o WhatsApp, só exibimos a simulação no console
     # Adicionar qualquer lógica extra para simulação aqui
 
+@csrf_exempt 
 def read_csv_and_send_messages():
     csv_file_path = os.path.join(settings.BASE_DIR, "csv_files", "contatos.csv")
     with open(csv_file_path, "r", encoding="utf-8") as file:
