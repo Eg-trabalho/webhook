@@ -4,6 +4,7 @@ import os
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+import requests
 
 
 @csrf_exempt
@@ -40,16 +41,10 @@ def process_incoming_message(message):
     print(f"Mensagem recebida de {from_number}: {text}")
     # Responda com lógica baseada no texto recebido
 
-@csrf_exempt
+
 def send_interactive_message(phone_number, nickname):
-    # Simulação do envio de mensagem (sem requisição real)
-    print(f"Simulando envio de mensagem para {nickname} ({phone_number})")
-    return {
-        "phone_number": phone_number,
-        "nickname": nickname
-    }
-    # Aqui, em vez de enviar para o WhatsApp, só exibimos a simulação no console
-    # Adicionar qualquer lógica extra para simulação aqui
+
+    print(f"Mensagem enviada para {nickname}, número: {phone_number}")
 
 
 @csrf_exempt
@@ -67,8 +62,8 @@ def read_csv_and_send_messages(request):
             if not rows:
                 return JsonResponse({"error": "O arquivo CSV está vazio!"}, status=400)
             
-            # Limitar para os primeiros 4 (ou o tamanho do CSV, se for menor que 4)
-            for idx in range(min(4, len(rows))):
+            # Limitar para os primeiros 100 (ou o tamanho do CSV, se for menor que 100)
+            for idx in range(min(100, len(rows))):
                 nickname = rows[idx].get("Escort Nickname *")
                 phone_number = rows[idx].get("WhatsApp Mobile Number (with country code 351) *")
                 
