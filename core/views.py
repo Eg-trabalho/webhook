@@ -4,6 +4,7 @@ import os
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+import requests
 
 
 @csrf_exempt
@@ -40,10 +41,10 @@ def process_incoming_message(message):
     print(f"Mensagem recebida de {from_number}: {text}")
     # Responda com lógica baseada no texto recebido
 
-@csrf_exempt
+
 def send_interactive_message(phone_number, nickname):
 
-    print(f"Mensagem enviada para {nickname}, número: {phone_number}")
+    print(f"Mensagem enviada para {nickname}, Número: {phone_number}")
 
 
 @csrf_exempt
@@ -62,6 +63,7 @@ def read_csv_and_send_messages(request):
                 return JsonResponse({"error": "O arquivo CSV está vazio!"}, status=400)
             
             # Limitar para os primeiros 100 (ou o tamanho do CSV, se for menor que 100)
+            cnt = 0
             for idx in range(min(100, len(rows))):
                 nickname = rows[idx].get("Escort Nickname *")
                 phone_number = rows[idx].get("WhatsApp Mobile Number (with country code 351) *")
@@ -71,12 +73,13 @@ def read_csv_and_send_messages(request):
                     continue
 
                 # Remover espaços do número de telefone
+                cnt +=1
                 phone_number = phone_number.replace(" ", "")
                 
                 # Chamar a função de envio de mensagem
                 send_interactive_message(phone_number, nickname)
 
-        return JsonResponse({"status": "success", "message": "Mensagens simuladas enviadas com sucesso!"}, status=200)
+        return JsonResponse({f"status": "success", "message": "{cnt} Mensagens simuladas enviadas com sucesso!"}, status=200)
 
     except Exception as e:
         print("Erro durante a leitura ou envio de mensagens:", str(e))
