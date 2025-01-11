@@ -44,10 +44,12 @@ def process_incoming_message(message):
 
 def send_interactive_message(phone_number, nickname):
     # Simulação do envio de mensagem (sem requisição real)
-    print(f"Simulando envio de mensagem para {phone_number}:")
-    print(f"Texto da mensagem: 'Olá {nickname}! Somos a empresa Girl e gostaríamos de ter você com a gente. Vamos conversar?'")
-    print("Opções de botão: 'Claro, vamos nessa!' e 'Não, deixa para uma próxima.'")
-    print("")
+   
+
+    return {
+        "phone_number": phone_number,
+        "nickname": nickname
+    }
     # Aqui, em vez de enviar para o WhatsApp, só exibimos a simulação no console
     # Adicionar qualquer lógica extra para simulação aqui
 
