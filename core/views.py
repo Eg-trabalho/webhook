@@ -40,11 +40,10 @@ def process_incoming_message(message):
     print(f"Mensagem recebida de {from_number}: {text}")
     # Responda com lógica baseada no texto recebido
 
-@csrf_exempt 
+@csrf_exempt
 def send_interactive_message(phone_number, nickname):
     # Simulação do envio de mensagem (sem requisição real)
-   
-
+    print(f"Simulando envio de mensagem para {nickname} ({phone_number})")
     return {
         "phone_number": phone_number,
         "nickname": nickname
@@ -52,10 +51,39 @@ def send_interactive_message(phone_number, nickname):
     # Aqui, em vez de enviar para o WhatsApp, só exibimos a simulação no console
     # Adicionar qualquer lógica extra para simulação aqui
 
-@csrf_exempt 
-def read_csv_and_send_messages():
-    csv_file_path = os.path.join(settings.BASE_DIR, "csv_files", "contatos.csv")
-    with open(csv_file_path, "r", encoding="utf-8") as file:
-        reader = csv.DictReader(file)
-        for idx in range(0, 4):
-            send_interactive_message(reader[idx]["Escort Nickname *"], reader[idx]["WhatsApp Mobile Number (with country code 351) *"])
+
+@csrf_exempt
+def read_csv_and_send_messages(request):
+    try:
+        # Verificar se o arquivo CSV existe
+        csv_file_path = os.path.join(settings.BASE_DIR, "csv_files", "contatos.csv")
+        if not os.path.exists(csv_file_path):
+            return JsonResponse({"error": f"O arquivo CSV não foi encontrado em: {csv_file_path}"}, status=400)
+        
+        with open(csv_file_path, "r", encoding="utf-8") as file:
+            reader = csv.DictReader(file)
+            # Garantir que o reader tem dados
+            rows = list(reader)
+            if not rows:
+                return JsonResponse({"error": "O arquivo CSV está vazio!"}, status=400)
+            
+            # Limitar para os primeiros 4 (ou o tamanho do CSV, se for menor que 4)
+            for idx in range(min(4, len(rows))):
+                nickname = rows[idx].get("Escort Nickname *")
+                phone_number = rows[idx].get("WhatsApp Mobile Number (with country code 351) *")
+                
+                if not nickname or not phone_number:
+                    print(f"Erro ao processar a linha {idx+1}: {rows[idx]}")
+                    continue
+
+                # Remover espaços do número de telefone
+                phone_number = phone_number.replace(" ", "")
+                
+                # Chamar a função de envio de mensagem
+                send_interactive_message(phone_number, nickname)
+
+        return JsonResponse({"status": "success", "message": "Mensagens simuladas enviadas com sucesso!"}, status=200)
+
+    except Exception as e:
+        print("Erro durante a leitura ou envio de mensagens:", str(e))
+        return JsonResponse({"error": "Erro interno do servidor", "details": str(e)}, status=500)
