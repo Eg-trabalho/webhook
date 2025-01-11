@@ -4,7 +4,6 @@ import os
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-import requests
 
 
 @csrf_exempt
@@ -41,7 +40,7 @@ def process_incoming_message(message):
     print(f"Mensagem recebida de {from_number}: {text}")
     # Responda com lógica baseada no texto recebido
 
-
+@csrf_exempt
 def send_interactive_message(phone_number, nickname):
 
     print(f"Mensagem enviada para {nickname}, número: {phone_number}")
