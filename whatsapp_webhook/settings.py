@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -131,4 +132,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-WHATSAPP_PHONE_NUMBER_ID= 228288213708946
+WHATSAPP_PHONE_NUMBER_ID= config('WHATSAPP_PHONE_NUMBER_ID', default=None)
+
+WHATSAPP_ACCESS_TOKEN= config('WHATSAPP_ACCESS_TOKEN', default=None)

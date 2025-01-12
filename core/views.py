@@ -1,10 +1,20 @@
 import csv
 import json
 import os
-from django.http import JsonResponse, HttpResponse 
+import time
+import requests
+import logging
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-import requests
+from .models import garota
+
+
+logging.basicConfig(
+    level=logging.INFO,       # Nível mínimo de mensagens a serem registradas
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Formato da mensagem
+    datefmt="%d-%m-%Y %H:%M:%S"  # Formato da data
+)
 
 
 @csrf_exempt
@@ -16,35 +26,104 @@ def whatsapp_webhook(request):
         challenge = request.GET.get("hub.challenge")
 
         if mode == "subscribe" and token == VERIFY_TOKEN:
+            logging.info("Webhook verificado com sucesso.")
             return HttpResponse(challenge, content_type="text/plain", status=200)
         else:
+            logging.warning("Token de verificação inválido. Token recebido: %s", token)
             return JsonResponse({"error": "Token de verificação inválido"}, status=403)
 
     elif request.method == "POST":
         try:
             payload = json.loads(request.body)
+            logging.info("Payload recebido: %s", payload)
             for entry in payload.get("entry", []):
                 for change in entry.get("changes", []):
                     if change.get("field") == "messages":
-                        messages = change["value"]["messages"]
+                        messages = change["value"].get("messages", [])
                         for message in messages:
                             process_incoming_message(message)
             return JsonResponse({"status": "success"}, status=200)
         except Exception as e:
-            print("Erro:", str(e))
+            logging.error("Erro no processamento do webhook: %s", e, exc_info=True)
             return JsonResponse({"error": "Erro no processamento"}, status=500)
 
 
 def process_incoming_message(message):
-    from_number = message["from"]
-    text = message.get("text", {}).get("body", "")
-    print(f"Mensagem recebida de {from_number}: {text}")
-    # Responda com lógica baseada no texto recebido
+    from_number = message.get("from", "número desconhecido")  # Número do cliente que enviou a mensagem
+    text = message.get("text", {}).get("body", "")  # Conteúdo da mensagem
 
+    logging.info(f"Mensagem recebida de {from_number}: {text}")
+
+    try:
+    # Respostas baseadas no texto recebido
+        if text == "Quero sim":
+            send_text_message(from_number, "Ótimo, nosso site está à sua espera! Acesse www.seusite.com para começar.")
+        elif text == "Não quero no momento":
+            send_text_message(from_number, "Que pena! Se mudar de ideia, estaremos aqui para te ajudar.")
+        else:
+            send_text_message(from_number, "Desculpe, não entendi sua resposta. Por favor, escolha uma das opções disponíveis.")
+    except Exception as e:
+        logging.error(f"Erro ao processar a mensagem de {from_number}: {e}")
+
+def send_text_message(phone_number, text):
+    """
+    Função para enviar uma mensagem de texto simples via WhatsApp.
+    """
+    url = f"https://graph.facebook.com/v17.0/{settings.WHATSAPP_PHONE_NUMBER_ID}/messages"
+    headers = {
+        "Authorization": f"Bearer {settings.WHATSAPP_ACCESS_TOKEN}",
+        "Content-Type": "application/json",
+    }
+    data = {
+        "messaging_product": "whatsapp",
+        "to": phone_number,
+        "type": "text",
+        "text": {"body": text},
+    }
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        logging.info("Mensagem enviada para %s. Status: %s", phone_number, response.status_code)
+    except requests.exceptions.RequestException as e:
+        logging.error("Erro ao enviar mensagem para %s: %s", phone_number, e, exc_info=True)
 
 def send_interactive_message(phone_number, nickname):
+    url = f"https://graph.facebook.com/v17.0/{settings.WHATSAPP_PHONE_NUMBER_ID}/messages" 
+    headers = {
+        "Authorization": f"Bearer {settings.WHATSAPP_ACCESS_TOKEN}",
+        "Content-Type": "application/json",
+    }
+    data = {
+        "messaging_product": "whatsapp",
+        "to": phone_number,
+        "type": "interactive",
+        "interactive": {
+            "type": "button",
+            "body": {
+                "text": f"Olá {nickname}! Somos a empresa Girl e gostaríamos de ter você com a gente. Vamos conversar?",
+            },
+            "action": {
+                "buttons": [
+                    {"type": "reply", "reply": {"id": "yes_option", "title": "Claro, vamos nessa!"}},
+                    {"type": "reply", "reply": {"id": "no_option", "title": "Não, deixa para uma próxima."}},
+                ]
+            },
+        },
+    }
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Erro ao enviar mensagem para {phone_number}: {e}")
+        return False
 
-    print(f"Mensagem enviada para {nickname}, Número: {phone_number}")
+    # Se a mensagem foi enviada com sucesso (status 200)
+    if response.status_code == 200:
+        # Salvar no banco de dados
+        garota.objects.get_or_create(phone_number=phone_number, defaults={"nickname": nickname})
+
+
+    logging.info(f"Mensagem enviada para {phone_number}. Status: {response.status_code}, Resposta: {response.text}")
 
 
 @csrf_exempt
@@ -53,34 +132,62 @@ def read_csv_and_send_messages(request):
         # Verificar se o arquivo CSV existe
         csv_file_path = os.path.join(settings.BASE_DIR, "csv_files", "contatos.csv")
         if not os.path.exists(csv_file_path):
+            logging.error("Arquivo CSV não encontrado em: %s", csv_file_path)
             return JsonResponse({"error": f"O arquivo CSV não foi encontrado em: {csv_file_path}"}, status=400)
         
         with open(csv_file_path, "r", encoding="utf-8") as file:
             reader = csv.DictReader(file)
-            # Garantir que o reader tem dados
             rows = list(reader)
+
             if not rows:
+                logging.warning("O arquivo CSV está vazio.")
                 return JsonResponse({"error": "O arquivo CSV está vazio!"}, status=400)
-            
-            # Limitar para os primeiros 100 (ou o tamanho do CSV, se for menor que 100)
-            cnt = 0
-            for idx in range(min(100, len(rows))):
-                nickname = rows[idx].get("Escort Nickname *")
-                phone_number = rows[idx].get("WhatsApp Mobile Number (with country code 351) *")
-                
+
+            # Limitar para os primeiros 100 (ou o tamanho do CSV, se menor que 100)
+            to_process = rows[:100]
+            remaining_contacts = rows[100:]  # Contatos que não serão processados agora
+            processed_successfully = []  # Lista para contatos enviados com sucesso
+
+            for idx, contact in enumerate(to_process):
+                nickname = contact.get("Escort Nickname *")
+                phone_number = contact.get("WhatsApp Mobile Number (with country code 351) *")
+
                 if not nickname or not phone_number:
-                    print(f"Erro ao processar a linha {idx+1}: {rows[idx]}")
+                    logging.warning(f"Dados ausentes na linha {idx+1}: {contact}")
                     continue
 
-                # Remover espaços do número de telefone
-                cnt +=1
+                # Remover espaços no número de telefone
                 phone_number = phone_number.replace(" ", "")
-                
-                # Chamar a função de envio de mensagem
-                send_interactive_message(phone_number, nickname)
 
-        return JsonResponse({"status": "success", "message": f"{cnt} Mensagens simuladas enviadas com sucesso!"}, status=200)
+                try:
+                    # Enviar a mensagem
+                    if send_interactive_message(phone_number, nickname):
+                        processed_successfully.append(contact)  # Adicionar à lista de sucesso
+                except Exception as e:
+                    logging.error(f"Erro ao enviar mensagem para {phone_number}: {e}")
+
+                time.sleep(1)
+
+            # Atualizar o arquivo CSV com os contatos restantes
+            contacts_to_keep = remaining_contacts + [
+                contact for contact in to_process if contact not in processed_successfully
+            ]
+
+            try:
+                with open(csv_file_path, "w", encoding="utf-8", newline="") as file:
+                    writer = csv.DictWriter(file, fieldnames=reader.fieldnames)
+                    writer.writeheader()
+                    writer.writerows(contacts_to_keep)
+            except IOError as e:
+                logging.error(f"Erro ao salvar o arquivo CSV: {e}")
+                return JsonResponse({"error": "Erro ao atualizar o arquivo CSV"}, status=500)
+        
+        logging.info("Mensagens enviadas com sucesso: %d de %d", len(processed_successfully), len(to_process))
+        return JsonResponse({
+            "status": "success",
+            "message": f"Mensagens enviadas com sucesso: {len(processed_successfully)} de {len(to_process)}"
+        }, status=200)
 
     except Exception as e:
-        print("Erro durante a leitura ou envio de mensagens:", str(e))
+        logging.critical("Erro durante a leitura ou envio de mensagens: %s", e, exc_info=True)
         return JsonResponse({"error": "Erro interno do servidor", "details": str(e)}, status=500)
