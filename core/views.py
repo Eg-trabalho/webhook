@@ -144,8 +144,8 @@ def read_csv_and_send_messages(request):
                 return JsonResponse({"error": "O arquivo CSV está vazio!"}, status=400)
 
             # Limitar para os primeiros 100 (ou o tamanho do CSV, se menor que 100)
-            to_process = rows[:100]
-            remaining_contacts = rows[100:]  # Contatos que não serão processados agora
+            to_process = rows[:2]
+            remaining_contacts = rows[2:]  # Contatos que não serão processados agora
             processed_successfully = []  # Lista para contatos enviados com sucesso
 
             for idx, contact in enumerate(to_process):
