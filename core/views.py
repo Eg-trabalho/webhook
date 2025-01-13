@@ -99,7 +99,7 @@ def send_interactive_message(phone_number, nickname):
         "to": "5585991389624", 
         "type": "template",
         "template": {
-            "name": "mensagem_botoes",
+            "name": "msg_botoes",
             "language": {
                 "code": "en_US" 
             },
@@ -107,7 +107,7 @@ def send_interactive_message(phone_number, nickname):
                 {
                     "type": "body",
                     "parameters": [
-                        { "type": "text", "text": "John" },  
+                        { "type": "text", "text": "Davi" },  
                         { "type": "text", "text": "CS Mutual" }, 
                         { "type": "text", "text": "suspicious" },  
                         { "type": "text", "text": "CS Mutual debit" }, 
