@@ -35,7 +35,6 @@ def whatsapp_webhook(request):
     elif request.method == "POST":
         try:
             payload = json.loads(request.body)
-            logging.info("Payload recebido: %s", payload)
             for entry in payload.get("entry", []):
                 for change in entry.get("changes", []):
                     if change.get("field") == "messages":
@@ -53,7 +52,7 @@ def process_incoming_message(message):
     text = message.get("text", {}).get("body", "")  # Conteúdo da mensagem
 
     logging.info(f"Mensagem recebida de {from_number}: {text}")
-
+    logging.error(f"Texto recebido: ---{text}---")
     try:
     # Respostas baseadas no texto recebido
         if text == "Yes":
@@ -203,3 +202,6 @@ def read_csv_and_send_messages(request):
     except Exception as e:
         logging.critical("Erro durante a leitura ou envio de mensagens: %s", e, exc_info=True)
         return JsonResponse({"error": "Erro interno do servidor", "details": str(e)}, status=500)
+    
+
+    payload
