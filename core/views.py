@@ -94,13 +94,21 @@ def send_interactive_message(phone_number, nickname):
         "Content-Type": "application/json",
     }
     data = {
+        "messaging_product": "whatsapp",
         "recipient_type": "individual",
         "to": "whatsapp-id",
         "type": "interactive",
         "interactive": {
             "type": "button",
+            "header": {
+                "type": "text",
+                "text": "Título da Mensagem"
+            },
             "body": {
-            "text": "Olá! Gostaríamos de saber sua opinião sobre nosso serviço. Escolha uma das opções abaixo."
+                "text": "Olá! Gostaríamos de saber sua opinião sobre nosso serviço. Escolha uma das opções abaixo."
+            },
+            "footer": {
+                "text": "Obrigado por sua participação!"
             },
             "action": {
                 "buttons": [
@@ -122,6 +130,7 @@ def send_interactive_message(phone_number, nickname):
             }
         }
     }
+
     try:
         response = requests.post(url, headers=headers, json=data)
         response.raise_for_status()
