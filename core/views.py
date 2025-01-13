@@ -95,6 +95,7 @@ def send_interactive_message(phone_number, nickname):
     }
     data ={
         "messaging_product": "whatsapp",
+        "recipient_type": "individual",
         "to": "PHONE_NUMBER", 
         "type": "template",
         "template": {
@@ -115,16 +116,6 @@ def send_interactive_message(phone_number, nickname):
                         { "type": "text", "text": "Jasper's Market" },  
                         { "type": "text", "text": "$12.34" } 
                     ]
-                },
-                {
-                    "type": "button",
-                    "sub_type": "quick_reply",
-                    "index": "0",
-                },
-                {
-                    "type": "button",
-                    "sub_type": "quick_reply",
-                    "index": "1", 
                 }
             ]
         }
