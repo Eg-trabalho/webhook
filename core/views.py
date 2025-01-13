@@ -223,6 +223,7 @@ def del_numeros(request):
     logging.info("Números deletados com sucesso.") # Log para verificar a exclusão dos números no console
     return JsonResponse({"status": "success"}, status=200)
 
+@csrf_exempt
 def ver_csv(request):
     try:
         # Verificar se o arquivo CSV existe
