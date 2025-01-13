@@ -96,7 +96,7 @@ def send_interactive_message(phone_number, nickname):
     data ={
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
-        "to": "PHONE_NUMBER", 
+        "to": "5585991389624", 
         "type": "template",
         "template": {
             "name": "mensagem_botoes",
