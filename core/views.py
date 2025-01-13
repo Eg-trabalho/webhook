@@ -131,9 +131,7 @@ def send_interactive_message(phone_number, nickname):
     if response.status_code == 200:
         # Salvar no banco de dados
         garota.objects.get_or_create(phone_number=phone_number, defaults={"nickname": nickname})
-
-
-    logging.info(f"Mensagem enviada para {phone_number}. Status: {response.status_code}, Resposta: {response.text}")
+        logging.info(f"Mensagem enviada para {phone_number}.")
 
 
 @csrf_exempt
@@ -172,7 +170,6 @@ def read_csv_and_send_messages(request):
                 try:
                     # Enviar a mensagem
                     if send_interactive_message(phone_number, nickname):
-                        logging.info(f"Mensagens enviadas com sucesso {len(processed_successfully)}/{len(to_process)} para {phone_number}")
                         processed_successfully.append(contact)  # Adicionar à lista de sucesso
                 except Exception as e:
                     logging.error(f"Erro ao enviar mensagem para {phone_number}: {e}")
@@ -204,4 +201,11 @@ def read_csv_and_send_messages(request):
         return JsonResponse({"error": "Erro interno do servidor", "details": str(e)}, status=500)
     
 
-    payload
+def ver_numeros(request):
+    numeros = garota.objects.all()
+    logging.info(f"Números: {numeros}") # Log para verificar os números no console
+
+def del_numeros(request):
+    garota.objects.all().delete()
+    logging.info("Números deletados com sucesso.") # Log para verificar a exclusão dos números no console
+    return JsonResponse({"status": "success"}, status=200)
