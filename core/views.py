@@ -136,6 +136,7 @@ def send_interactive_message(phone_number, nickname):
 
 @csrf_exempt
 def read_csv_and_send_messages(request):
+    numeros_salvos = garota.objects.all()
     try:
         # Verificar se o arquivo CSV existe
         csv_file_path = os.path.join(settings.BASE_DIR, "csv_files", "contatos.csv")
@@ -166,6 +167,10 @@ def read_csv_and_send_messages(request):
 
                 # Remover espaços no número de telefone
                 phone_number = phone_number.replace(" ", "")
+
+                if phone_number in numeros_salvos:
+                    logging.warning(f"O número {phone_number} já foi processado anteriormente.")
+                    continue
 
                 try:
                     # Enviar a mensagem
