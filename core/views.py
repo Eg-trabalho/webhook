@@ -95,10 +95,31 @@ def send_interactive_message(phone_number, nickname):
     }
     data = {
         "messaging_product": "whatsapp",
-        "to": phone_number,  # Número do destinatário (formato internacional)
-        "type": "text",
-        "text": {
-            "body": "text"  # O texto da mensagem que você quer enviar
+        "to": phone_number,  # Número do destinatário no formato internacional
+        "type": "interactive",
+        "interactive": {
+            "type": "button",  # Tipo de interação: botão
+            "body": {
+                "text": f"Olá {nickname}! Somos a empresa Girl e gostaríamos de ter você com a gente. Vamos conversar?"
+            },
+            "action": {
+                "buttons": [
+                    {
+                        "type": "reply",  # O tipo deve ser "reply" para botões interativos
+                        "reply": {
+                            "id": "yes_option",  # Um ID único para este botão
+                            "title": "Claro, vamos nessa!"  # O texto do botão
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "no_option",
+                            "title": "Não, deixa para uma próxima."  # O texto do botão
+                        }
+                    }
+                ]
+            }
         }
     }
     try:
