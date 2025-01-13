@@ -214,11 +214,11 @@ def ver_numeros(request):
     return JsonResponse({"numeros": list(numeros.values())}, status=200)
 
 @csrf_exempt
-def del_numeros(request):
-    status = garota.objects.all().delete()
+def del_numeros(request, num):
+    status = garota.objects.filter(phone_number=num).delete()
     if status[0] == 0:
-        logging.error("Erro ao deletar os números.")
-        return JsonResponse({"error": "Erro ao deletar os números."}, status=500)
+        logging.error(f"Erro ao deletar o número {num}.")
+        return JsonResponse({f"error": "Erro ao deletar o número {num}."}, status=500)
     
     logging.info("Números deletados com sucesso.") # Log para verificar a exclusão dos números no console
     return JsonResponse({"status": "success"}, status=200)
