@@ -86,6 +86,7 @@ def send_text_message(phone_number, text):
     except requests.exceptions.RequestException as e:
         logging.error("Erro ao enviar mensagem para %s: %s", phone_number, e, exc_info=True)
 
+
 def send_interactive_message(phone_number, nickname):
     url = f"https://graph.facebook.com/v21.0/{settings.WHATSAPP_PHONE_NUMBER_ID}/messages" 
     headers = {
@@ -203,12 +204,13 @@ def read_csv_and_send_messages(request):
         logging.critical("Erro durante a leitura ou envio de mensagens: %s", e, exc_info=True)
         return JsonResponse({"error": "Erro interno do servidor", "details": str(e)}, status=500)
     
-
+@csrf_exempt
 def ver_numeros(request):
     numeros = garota.objects.all()
     logging.info(f"Números: {numeros}") # Log para verificar os números no console
     return JsonResponse({"numeros": list(numeros.values())}, status=200)
 
+@csrf_exempt
 def del_numeros(request):
     status = garota.objects.all().delete()
     if status[0] == 0:
