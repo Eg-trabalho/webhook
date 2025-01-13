@@ -56,9 +56,9 @@ def process_incoming_message(message):
 
     try:
     # Respostas baseadas no texto recebido
-        if text == "Quero sim":
-            send_text_message(from_number, "Ótimo, nosso site está à sua espera! Acesse www.seusite.com para começar.")
-        elif text == "Não quero no momento":
+        if text == "Yes":
+            send_text_message(from_number, "Ótimo, nosso site está à sua espera! Acesse www.exclusivegirls.net para começar.")
+        elif text == "No":
             send_text_message(from_number, "Que pena! Se mudar de ideia, estaremos aqui para te ajudar.")
         else:
             send_text_message(from_number, "Desculpe, não entendi sua resposta. Por favor, escolha uma das opções disponíveis.")
