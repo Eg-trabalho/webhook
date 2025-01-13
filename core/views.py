@@ -126,17 +126,12 @@ def send_interactive_message(phone_number, nickname):
     except requests.exceptions.RequestException as e:
         logging.error(f"Erro ao enviar mensagem para {phone_number}: {e}")
         return False
-
-    # Se a mensagem foi enviada com sucesso (status 200)
-    if response.status_code == 200:
-        # Salvar no banco de dados
-        garota.objects.get_or_create(phone_number=phone_number, defaults={"nickname": nickname})
-        logging.info(f"Mensagem enviada para {phone_number}.")
+        
 
 
 @csrf_exempt
 def read_csv_and_send_messages(request):
-    numeros_salvos = garota.objects.all()
+    numeros_salvos = set(garota.objects.values_list("phone_number", flat=True))
     try:
         # Verificar se o arquivo CSV existe
         csv_file_path = os.path.join(settings.BASE_DIR, "csv_files", "contatos.csv")
@@ -176,6 +171,9 @@ def read_csv_and_send_messages(request):
                     # Enviar a mensagem
                     if send_interactive_message(phone_number, nickname):
                         processed_successfully.append(contact)  # Adicionar à lista de sucesso
+                        logging.info(f"Mensagem enviada para {phone_number}.")
+                        garota.objects.get_or_create(phone_number=phone_number, defaults={"nickname": nickname})
+                        
                 except Exception as e:
                     logging.error(f"Erro ao enviar mensagem para {phone_number}: {e}")
 
@@ -183,7 +181,7 @@ def read_csv_and_send_messages(request):
 
             # Atualizar o arquivo CSV com os contatos restantes
             contacts_to_keep = remaining_contacts + [
-                contact for contact in to_process if contact not in processed_successfully
+                contact for contact in to_process if contact not in processed_successfully and and contact.get("WhatsApp Mobile Number (with country code 351) *").replace(" ", "") not in numeros_salvos
             ]
 
             try:
@@ -212,6 +210,10 @@ def ver_numeros(request):
     return JsonResponse({"numeros": list(numeros.values())}, status=200)
 
 def del_numeros(request):
-    garota.objects.all().delete()
+    status = garota.objects.all().delete()
+    if status[0] == 0:
+        logging.error("Erro ao deletar os números.")
+        return JsonResponse({"error": "Erro ao deletar os números."}, status=500)
+    
     logging.info("Números deletados com sucesso.") # Log para verificar a exclusão dos números no console
     return JsonResponse({"status": "success"}, status=200)
