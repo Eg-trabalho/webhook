@@ -107,8 +107,8 @@ def send_interactive_message(phone_number, nickname):
                 {
                     "type": "body",
                     "parameters": [
-                        { "type": "text", "text": "Davi" },  
-                        { "type": "text", "text": "CS Mutual" }, 
+                        { "type": "text", "text": "Luis" },  
+                        { "type": "text", "text": "ExclusiveGirls" }, 
                         { "type": "text", "text": "suspicious" },  
                         { "type": "text", "text": "CS Mutual debit" }, 
                         { "type": "text", "text": "1234" },  
@@ -155,8 +155,8 @@ def read_csv_and_send_messages(request):
                 return JsonResponse({"error": "O arquivo CSV está vazio!"}, status=400)
 
             # Limitar para os primeiros 100 (ou o tamanho do CSV, se menor que 100)
-            to_process = rows[:2]
-            remaining_contacts = rows[2:]  # Contatos que não serão processados agora
+            to_process = rows[:1]
+            remaining_contacts = rows[1:]  # Contatos que não serão processados agora
             processed_successfully = []  # Lista para contatos enviados com sucesso
 
             for idx, contact in enumerate(to_process):
