@@ -181,7 +181,7 @@ def read_csv_and_send_messages(request):
 
             # Atualizar o arquivo CSV com os contatos restantes
             contacts_to_keep = remaining_contacts + [
-                contact for contact in to_process if contact not in processed_successfully and and contact.get("WhatsApp Mobile Number (with country code 351) *").replace(" ", "") not in numeros_salvos
+                contact for contact in to_process if contact not in processed_successfully and contact.get("WhatsApp Mobile Number (with country code 351) *").replace(" ", "") not in numeros_salvos
             ]
 
             try:
