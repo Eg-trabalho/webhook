@@ -204,6 +204,7 @@ def read_csv_and_send_messages(request):
 def ver_numeros(request):
     numeros = garota.objects.all()
     logging.info(f"Números: {numeros}") # Log para verificar os números no console
+    return JsonResponse({"numeros": list(numeros.values())}, status=200)
 
 def del_numeros(request):
     garota.objects.all().delete()
