@@ -94,28 +94,28 @@ def send_interactive_message(phone_number, nickname):
         "Content-Type": "application/json",
     }
     data = {
-        "messaging_product": "whatsapp",
-        "to": "5585991389624",  # Número do destinatário
+        "recipient_type": "individual",
+        "to": "whatsapp-id",
         "type": "interactive",
         "interactive": {
             "type": "button",
             "body": {
-                "text": "Olá! Somos a empresa Girl e gostaríamos de ter você com a gente. Vamos conversar?"
+            "text": "Olá! Gostaríamos de saber sua opinião sobre nosso serviço. Escolha uma das opções abaixo."
             },
             "action": {
                 "buttons": [
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "yes_option",
-                            "title": "Claro, vamos nessa!"
+                            "id": "feedback_positive",
+                            "title": "Adorei!"
                         }
                     },
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "no_option",
-                            "title": "Não, deixa para uma próxima."
+                            "id": "feedback_negative",
+                            "title": "Pode melhorar."
                         }
                     }
                 ]
