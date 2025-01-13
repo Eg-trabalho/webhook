@@ -222,3 +222,19 @@ def del_numeros(request):
     
     logging.info("Números deletados com sucesso.") # Log para verificar a exclusão dos números no console
     return JsonResponse({"status": "success"}, status=200)
+
+def ver_csv(request):
+    try:
+        # Verificar se o arquivo CSV existe
+        csv_file_path = os.path.join(settings.BASE_DIR, "csv_files", "contatos.csv")
+        if not os.path.exists(csv_file_path):
+            logging.error("Arquivo CSV não encontrado em: %s", csv_file_path)
+            return JsonResponse({"error": f"O arquivo CSV não foi encontrado em: {csv_file_path}"}, status=400)
+        
+        with open(csv_file_path, "r", encoding="utf-8") as file:
+            reader = csv.DictReader(file)
+            rows = list(reader)
+        return JsonResponse({"rows": rows, "nome_inicial":rows.get("Escort Nickname *"), "numero_inicial": rows.get("WhatsApp Mobile Number (with country code 351) *")}, status=200)
+    except Exception as e:
+        logging.error(f"Erro ao ler o arquivo CSV: {e}")
+        return JsonResponse({"error": "Erro ao ler o arquivo CSV"}, status=500)
