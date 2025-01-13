@@ -243,7 +243,30 @@ def ver_csv(request):
             nome_inicial = rows[0].get("Escort Nickname *")
             numero_inicial = rows[0].get("WhatsApp Mobile Number (with country code 351) *")
 
-        return JsonResponse({"rows": rows, "nome_inicial": nome_inicial, "numero_inicial": numero_inicial}, status=200)
+        return JsonResponse({"rows": len(rows), "nome_inicial": nome_inicial, "numero_inicial": numero_inicial}, status=200)
+    except Exception as e:
+        logging.error(f"Erro ao ler o arquivo CSV: {e}")
+        return JsonResponse({"error": "Erro ao ler o arquivo CSV"}, status=500)
+    
+
+@csrf_exempt
+def ver_csv_inteiro(request):
+    try:
+        # Verificar se o arquivo CSV existe
+        csv_file_path = os.path.join(settings.BASE_DIR, "csv_files", "contatos.csv")
+        if not os.path.exists(csv_file_path):
+            logging.error("Arquivo CSV não encontrado em: %s", csv_file_path)
+            return JsonResponse({"error": f"O arquivo CSV não foi encontrado em: {csv_file_path}"}, status=400)
+        
+        with open(csv_file_path, "r", encoding="utf-8") as file:
+            reader = csv.DictReader(file)
+            rows = list(reader)
+
+            if not rows:
+                logging.warning("O arquivo CSV está vazio ou não possui linhas válidas.")
+                return JsonResponse({"error": "O arquivo CSV está vazio!"}, status=400)
+            
+        return JsonResponse({"rows": rows}, status=200)
     except Exception as e:
         logging.error(f"Erro ao ler o arquivo CSV: {e}")
         return JsonResponse({"error": "Erro ao ler o arquivo CSV"}, status=500)
