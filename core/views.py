@@ -95,39 +95,23 @@ def send_interactive_message(phone_number, nickname):
     }
     data = {
         "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": "whatsapp-id",
-        "type": "interactive",
-        "interactive": {
-            "type": "button",
-            "header": {
-                "type": "text",
-                "text": "Título da Mensagem"
+        "to": phone_number,
+        "type": "template",
+        "template": {
+            "name": "mensagem_teste",  # Nome do template no WhatsApp
+            "language": {
+                "code": "pt_BR"  # Idioma do template
             },
-            "body": {
-                "text": "Olá! Gostaríamos de saber sua opinião sobre nosso serviço. Escolha uma das opções abaixo."
-            },
-            "footer": {
-                "text": "Obrigado por sua participação!"
-            },
-            "action": {
-                "buttons": [
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "feedback_positive",
-                            "title": "Adorei!"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "feedback_negative",
-                            "title": "Pode melhorar."
-                        }
-                    }
-                ]
-            }
+            "components": [
+                {
+                    "type": "body",
+                    "parameters": [
+                        {"type": "text", "text": "Davi"},  # Substituir "John" pelo valor dinâmico
+                        {"type": "text", "text": "16º de Agosto de 2025"},  # Outro valor dinâmico
+                        {"type": "text", "text": "1800-555-1234"}  # Outro valor dinâmico
+                    ]
+                }
+            ]
         }
     }
 
