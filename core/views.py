@@ -128,7 +128,7 @@ def send_interactive_message(phone_number, nickname):
         logging.error(f"Erro ao enviar mensagem para {phone_number}: {e}")
         return False
     
-    if response == 200:
+    if response.status_code == 200:
         garota.objects.get_or_create(phone_number=phone_number, defaults={"nickname": nickname})
         return True
         
