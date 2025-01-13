@@ -95,27 +95,27 @@ def send_interactive_message(phone_number, nickname):
     }
     data = {
         "messaging_product": "whatsapp",
-        "to": phone_number,  # Número do destinatário no formato internacional
+        "to": "5585991389624",  # Número do destinatário
         "type": "interactive",
         "interactive": {
-            "type": "button",  # Tipo de interação: botão
+            "type": "button",
             "body": {
-                "text": f"Olá {nickname}! Somos a empresa Girl e gostaríamos de ter você com a gente. Vamos conversar?"
+                "text": "Olá! Somos a empresa Girl e gostaríamos de ter você com a gente. Vamos conversar?"
             },
             "action": {
                 "buttons": [
                     {
-                        "type": "reply",  # O tipo deve ser "reply" para botões interativos
+                        "type": "reply",
                         "reply": {
-                            "id": "yes_option",  # Um ID único para este botão
-                            "title": "Claro, vamos nessa!"  # O texto do botão
+                            "id": "yes_option",
+                            "title": "Claro, vamos nessa!"
                         }
                     },
                     {
                         "type": "reply",
                         "reply": {
                             "id": "no_option",
-                            "title": "Não, deixa para uma próxima."  # O texto do botão
+                            "title": "Não, deixa para uma próxima."
                         }
                     }
                 ]
@@ -174,6 +174,7 @@ def read_csv_and_send_messages(request):
                 try:
                     # Enviar a mensagem
                     if send_interactive_message(phone_number, nickname):
+                        logging.info(f"Mensagens enviadas com sucesso {len(processed_successfully)}/{len(to_process)} para {phone_number}")
                         processed_successfully.append(contact)  # Adicionar à lista de sucesso
                 except Exception as e:
                     logging.error(f"Erro ao enviar mensagem para {phone_number}: {e}")
@@ -194,10 +195,10 @@ def read_csv_and_send_messages(request):
                 logging.error(f"Erro ao salvar o arquivo CSV: {e}")
                 return JsonResponse({"error": "Erro ao atualizar o arquivo CSV"}, status=500)
         
-        logging.info("Mensagens enviadas com sucesso: %d de %d", len(processed_successfully), len(to_process))
+        
         return JsonResponse({
             "status": "success",
-            "message": f"Mensagens enviadas com sucesso: {len(processed_successfully)} de {len(to_process)}"
+            "message": f"Mensagens enviadas com sucesso {len(processed_successfully)}/{len(to_process)} para {phone_number}"
         }, status=200)
 
     except Exception as e:
