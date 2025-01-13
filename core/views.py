@@ -93,23 +93,38 @@ def send_interactive_message(phone_number, nickname):
         "Authorization": f"Bearer {settings.WHATSAPP_ACCESS_TOKEN}",
         "Content-Type": "application/json",
     }
-    data = {
+    data ={
         "messaging_product": "whatsapp",
-        "to": phone_number,
+        "to": "PHONE_NUMBER", 
         "type": "template",
         "template": {
-            "name": "mensagem_teste",  # Nome do template no WhatsApp
+            "name": "mensagem_botoes",
             "language": {
-                "code": "pt_BR"  # Idioma do template
+                "code": "en_US" 
             },
             "components": [
                 {
                     "type": "body",
                     "parameters": [
-                        {"type": "text", "text": "Davi"},  # Substituir "John" pelo valor dinâmico
-                        {"type": "text", "text": "16º de Agosto de 2025"},  # Outro valor dinâmico
-                        {"type": "text", "text": "1800-555-1234"}  # Outro valor dinâmico
+                        { "type": "text", "text": "John" },  
+                        { "type": "text", "text": "CS Mutual" }, 
+                        { "type": "text", "text": "suspicious" },  
+                        { "type": "text", "text": "CS Mutual debit" }, 
+                        { "type": "text", "text": "1234" },  
+                        { "type": "text", "text": "Jan 1, 2024" },  
+                        { "type": "text", "text": "Jasper's Market" },  
+                        { "type": "text", "text": "$12.34" } 
                     ]
+                },
+                {
+                    "type": "button",
+                    "sub_type": "quick_reply",
+                    "index": "0",
+                },
+                {
+                    "type": "button",
+                    "sub_type": "quick_reply",
+                    "index": "1", 
                 }
             ]
         }
