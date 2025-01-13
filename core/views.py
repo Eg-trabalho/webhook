@@ -235,7 +235,15 @@ def ver_csv(request):
         with open(csv_file_path, "r", encoding="utf-8") as file:
             reader = csv.DictReader(file)
             rows = list(reader)
-        return JsonResponse({"rows": rows, "nome_inicial":rows.get("Escort Nickname *"), "numero_inicial": rows.get("WhatsApp Mobile Number (with country code 351) *")}, status=200)
+
+            if not rows:
+                logging.warning("O arquivo CSV está vazio ou não possui linhas válidas.")
+                return JsonResponse({"error": "O arquivo CSV está vazio!"}, status=400)
+            
+            nome_inicial = rows[0].get("Escort Nickname *")
+            numero_inicial = rows[0].get("WhatsApp Mobile Number (with country code 351) *")
+
+        return JsonResponse({"rows": rows, "nome_inicial": nome_inicial, "numero_inicial": numero_inicial}, status=200)
     except Exception as e:
         logging.error(f"Erro ao ler o arquivo CSV: {e}")
         return JsonResponse({"error": "Erro ao ler o arquivo CSV"}, status=500)
