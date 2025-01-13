@@ -127,6 +127,10 @@ def send_interactive_message(phone_number, nickname):
     except requests.exceptions.RequestException as e:
         logging.error(f"Erro ao enviar mensagem para {phone_number}: {e}")
         return False
+    
+    if response == 200:
+        garota.objects.get_or_create(phone_number=phone_number, defaults={"nickname": nickname})
+        return True
         
 
 
@@ -166,14 +170,13 @@ def read_csv_and_send_messages(request):
 
                 if phone_number in numeros_salvos:
                     logging.warning(f"O número {phone_number} já foi processado anteriormente.")
-                    continue
+                    return JsonResponse({"error": f"O número {phone_number} já foi processado anteriormente."}, status=400)
 
                 try:
                     # Enviar a mensagem
                     if send_interactive_message(phone_number, nickname):
                         processed_successfully.append(contact)  # Adicionar à lista de sucesso
                         logging.info(f"Mensagem enviada para {phone_number}.")
-                        garota.objects.get_or_create(phone_number=phone_number, defaults={"nickname": nickname})
                         
                 except Exception as e:
                     logging.error(f"Erro ao enviar mensagem para {phone_number}: {e}")
