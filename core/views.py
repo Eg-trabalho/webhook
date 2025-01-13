@@ -49,7 +49,7 @@ def whatsapp_webhook(request):
 
 def process_incoming_message(message):
     from_number = message.get("from", "número desconhecido")  # Número do cliente que enviou a mensagem
-    text = message.get("text", {}).get("body", "")  # Conteúdo da mensagem
+    text = message.get("button", {}).get("text", "")  # Conteúdo da mensagem
 
     logging.info(f"Mensagem recebida de {from_number}: {text}")
     logging.error(f"Texto recebido: ---{text}---")
